@@ -36,14 +36,8 @@ const is_hosted = process.env.IS_HOSTED || false;
 const hostedURI = process.env.HOSTED_URI;
 const localURI = process.env.LOCAL_URI;
 if (is_hosted) {
-    var database = new MongoClient(hostedURI, {
-        useNewUrlParser: true,
-        useUnifiedTopology: true,
-    });
+    var database = new MongoClient(hostedURI);
 } else {
-    var database = new MongoClient(localURI, {
-        useNewUrlParser: true,
-        useUnifiedTopology: true,
-    });
+    var database = new MongoClient(localURI);
 }
 module.exports = database;
