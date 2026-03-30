@@ -103,8 +103,9 @@ router.get("/deleteUser", async (req, res) => {
             await userCollection.deleteOne({
                 _id: new ObjectId(validationResult.value),
             });
-            console.log("deleteUser: ");
-            console.log(deleteUser);
+
+            // console.log("deleteUser: ");
+            // console.log(deleteUser);
         }
         res.redirect("/");
     } catch (ex) {
