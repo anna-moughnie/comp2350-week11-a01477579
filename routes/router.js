@@ -8,6 +8,15 @@ const database = include("databaseConnection");
 
 const crypto = require("crypto");
 const { v4: uuid } = require("uuid");
+const Joi = require("joi");
+
+const deleteUserSchema = Joi.string().required();
+const addUserSchema = Joi.object({
+    first_name: Joi.string().required(),
+    last_name: Joi.string().required(),
+    email: Joi.string().email().required(),
+    password: Joi.string().required(),
+});
 
 const passwordPepper = "SeCretPeppa4MySal+";
 
@@ -79,14 +88,19 @@ router.get("/deleteUser", async (req, res) => {
         console.log("delete user");
 
         let userId = req.query.id;
-        if (userId) {
+        const validationResult = deleteUserSchema.validate(userId);
+
+        if (validationResult.error != null) {
+            console.log(validationResult.error);
+            throw validationResult.error;
+        } else {
             console.log("userId: " + userId);
-            let deleteUser = await userModel.findByPk(userId);
+            // let deleteUser = await userModel.findByPk(userId);
+            database.deleteOne({
+                _id: new ObjectId(validationResult.value.id),
+            });
             console.log("deleteUser: ");
             console.log(deleteUser);
-            if (deleteUser !== null) {
-                await deleteUser.destroy();
-            }
         }
         res.redirect("/");
     } catch (ex) {
@@ -110,14 +124,15 @@ router.post("/addUser", async (req, res) => {
             req.body.password + passwordPepper + password_salt,
         );
 
-        let newUser = userModel.build({
-            first_name: req.body.first_name,
-            last_name: req.body.last_name,
-            email: req.body.email,
-            password_salt: password_salt.digest("hex"),
-            password_hash: password_hash.digest("hex"),
-        });
-        await newUser.save();
+        // let newUser = userModel.build({
+        //     first_name: req.body.first_name,
+        //     last_name: req.body.last_name,
+        //     email: req.body.email,
+        //     password_salt: password_salt.digest("hex"),
+        //     password_hash: password_hash.digest("hex"),
+        // });
+        // await newUser.save();
+
         res.redirect("/");
     } catch (ex) {
         res.render("error", { message: "Error connecting to MySQL" });

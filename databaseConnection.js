@@ -35,6 +35,7 @@ const is_hosted = process.env.IS_HOSTED || false;
 
 const hostedURI = process.env.HOSTED_URI;
 const localURI = process.env.LOCAL_URI;
+console.log(hostedURI);
 if (is_hosted) {
     var database = new MongoClient(hostedURI);
 } else {
