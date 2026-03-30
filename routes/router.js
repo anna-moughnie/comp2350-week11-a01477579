@@ -90,7 +90,7 @@ router.get("/deleteUser", async (req, res) => {
         let userId = req.query.id;
         const validationResult = deleteUserSchema.validate(userId);
 
-        if (validationResult.error != null) {
+        if (validationResult.error) {
             console.log(validationResult.error);
             throw validationResult.error;
         } else {
@@ -120,9 +120,25 @@ router.post("/addUser", async (req, res) => {
 
         const password_hash = crypto.createHash("sha512");
 
+        const valRes = addUserSchema.validate(req.body);
+
+        if (valRes.error) {
+            return res.render("error", { message: valRes.error.details });
+        }
+
+        const userCollection = database.db("lab_example").collection("users");
+
         password_hash.update(
-            req.body.password + passwordPepper + password_salt,
+            valRes.value.password + passwordPepper + password_salt,
         );
+
+        const newUser = {
+            first_name: valRes.value.first_name,
+            last_name: valRes.value.last_name,
+            email: valRes.value.email,
+            password_salt: password_salt.digest("hex"),
+            password_hash: password_hash.digest("hex"),
+        };
 
         // let newUser = userModel.build({
         //     first_name: req.body.first_name,
@@ -133,6 +149,8 @@ router.post("/addUser", async (req, res) => {
         // });
         // await newUser.save();
 
+        const result = await userCollection.insertOne(newUser);
+        console.log("Inserted user:", result.insertedId);
         res.redirect("/");
     } catch (ex) {
         res.render("error", { message: "Error connecting to MySQL" });
