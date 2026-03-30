@@ -97,7 +97,7 @@ router.get("/deleteUser", async (req, res) => {
             console.log("userId: " + userId);
             // let deleteUser = await userModel.findByPk(userId);
             database.deleteOne({
-                _id: new ObjectId(validationResult.value.id),
+                _id: new ObjectId(validationResult.value._id),
             });
             console.log("deleteUser: ");
             console.log(deleteUser);
